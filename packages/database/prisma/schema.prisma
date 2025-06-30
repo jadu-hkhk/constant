@@ -7,3 +7,32 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Website {
+  id        String        @id @default(cuid())
+  url       String        @unique
+  timeAdded DateTime      @default(now())
+  ticks     WebsiteTick[]
+}
+
+model Region {
+  id    String        @id @default(cuid())
+  name  String
+  ticks WebsiteTick[]
+}
+
+model WebsiteTick {
+  id             String  @id @default(cuid())
+  responseTimeMs Int
+  status         Status
+  websiteId      String
+  regionId       String
+  website        Website @relation(fields: [websiteId], references: [id])
+  region         Region  @relation(fields: [regionId], references: [id])
+}
+
+enum Status {
+  UP
+  DOWN
+  UNKNOWN
+}
