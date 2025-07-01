@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
     "build": "tsc -b",
     "start": "node dist/index.js",
     "dev": "pnpm run build && pnpm run start"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*"
+    "@repo/db": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.1",
+    "vitest": "^3.2.4"
   },
   "keywords": [],
   "author": "",
