@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -22,13 +21,14 @@ model Region {
 }
 
 model WebsiteTick {
-  id             String  @id @default(cuid())
+  id             String   @id @default(cuid())
   responseTimeMs Int
   status         Status
   websiteId      String
   regionId       String
-  website        Website @relation(fields: [websiteId], references: [id])
-  region         Region  @relation(fields: [regionId], references: [id])
+  website        Website  @relation(fields: [websiteId], references: [id])
+  region         Region   @relation(fields: [regionId], references: [id])
+  createdAt      DateTime @default(now())
 }
 
 enum Status {
