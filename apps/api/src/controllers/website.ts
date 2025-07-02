@@ -13,6 +13,11 @@ export const createWebsite = async (req: Request, res: Response) => {
   const website = await prisma.website.create({
     data: {
       url,
+      user: {
+        connect: {
+          id: req.userId,
+        },
+      },
     },
   })
   res.status(201).json({

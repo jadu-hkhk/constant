@@ -23,6 +23,7 @@ describe("Website API", () => {
         id: "123",
         url: "https://www.google.com",
         timeAdded: new Date(),
+        userId: "123",
       }
 
       vi.mocked(prisma.website.create).mockResolvedValue(mockWebsite)
