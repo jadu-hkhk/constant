@@ -1,32 +1,61 @@
-import { prisma } from "@repo/db"
+import { type Prisma, prisma } from "@repo/db"
 import type { Request, Response } from "express"
 
 export const createWebsite = async (req: Request, res: Response) => {
   const { url } = req.body
 
-  if (!url) {
-    res.status(400).json({
-      message: "URL is required",
+  try {
+    const website = await prisma.website.create({
+      data: {
+        url,
+        userId: req.userId as string,
+      },
     })
-    return
+    res.status(201).json({
+      id: website.id,
+    })
+  } catch (e) {
+    if ((e as Prisma.PrismaClientKnownRequestError).code === "P2002") {
+      res.status(409).json({
+        message: "Website already exists",
+      })
+      return
+    }
+    res.status(500).json({ message: "Internal server error" })
   }
-  const website = await prisma.website.create({
-    data: {
-      url,
-      user: {
-        connect: {
-          id: req.userId,
+}
+
+export const getWebsiteStatus = async (req: Request, res: Response) => {
+  const { websiteId } = req.params
+
+  const website = await prisma.website.findUnique({
+    where: {
+      id: websiteId,
+      userId: req.userId as string,
+    },
+    include: {
+      ticks: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+        include: {
+          region: true,
         },
       },
     },
   })
-  res.status(201).json({
-    id: website.id,
-  })
-}
 
-export const getWebsiteStatus = (_req: Request, res: Response) => {
-  res.json({
-    message: "Website status",
+  if (!website) {
+    res.status(404).json({
+      message: "Website not found",
+    })
+    return
+  }
+
+  res.status(200).json({
+    status: website.ticks[0]?.status,
+    responseTimeMs: website.ticks[0]?.responseTimeMs,
+    region: website.ticks[0]?.region.name,
   })
 }
