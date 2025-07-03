@@ -1,3 +1,4 @@
+import "dotenv/config"
 import express, { type Application } from "express"
 import v1Router from "./routes"
 

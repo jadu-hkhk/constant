@@ -6,22 +6,29 @@
   "scripts": {
     "test": "vitest --reporter=verbose",
     "build": "tsc -b",
-    "start": "node dist/index.js",
-    "dev": "pnpm run build && pnpm run start"
+    "start": "node dist/bin.js",
+    "dev": "tsx watch src/bin.ts"
   },
   "devDependencies": {
     "@repo/db": "workspace:*",
+    "@repo/shared": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/supertest": "^6.0.3",
     "supertest": "^7.1.1",
+    "tsx": "^4.20.3",
     "vitest": "^3.2.4"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.0.1",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "zod": "^3.25.67"
   }
 }
