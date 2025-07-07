@@ -295,12 +295,12 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--brand-primary));
+  background: hsl(var(--brand-primary) / 0.8);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--brand-secondary));
+  background: hsl(var(--brand-primary));
 }
 
 /* Glassmorphism effect */
