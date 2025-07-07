@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db"
+import { prisma, type Website } from "@repo/db"
 import jwt from "jsonwebtoken"
 import request from "supertest"
 import { beforeEach, describe, expect, it, vi } from "vitest"
@@ -188,6 +188,43 @@ describe("Website API", () => {
 
         expect(response.status).toBe(404)
         expect(response.body.message).toBe("Website not found")
+      })
+    })
+  })
+
+  describe("GET /api/v1/website/all", () => {
+    describe("Authentication", () => {
+      it("should not get all websites if the user is not authenticated", async () => {
+        const response = await request(app).get("/api/v1/website/all")
+
+        expect(response.status).toBe(401)
+        expect(response.body.message).toBe("Unauthorized")
+      })
+    })
+
+    describe("Success", () => {
+      it.todo("should get all websites if the user is authenticated", async () => {
+        const mockWebsites = [
+          {
+            id: "123",
+            url: "https://www.google.com",
+            timeAdded: new Date(),
+            userId: "123",
+          },
+        ] as Website[]
+        vi.mocked(prisma.website.findMany).mockResolvedValue(mockWebsites)
+
+        const response = await request(app).get("/api/v1/website/all").set("Cookie", "token=123")
+
+        expect(response.status).toBe(200)
+        expect(prisma.website.findMany).toHaveBeenCalledWith({
+          where: {
+            userId: "123",
+          },
+        })
+        expect(response.body).toEqual({
+          websites: mockWebsites,
+        })
       })
     })
   })

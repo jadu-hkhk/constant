@@ -12,16 +12,15 @@ model User {
   email     String    @unique
   password  String
   createdAt DateTime  @default(now())
-  websites  Website[]
+  websites  Website[] @relation("UserWebsites")
 }
 
 model Website {
   id        String        @id @default(cuid())
   url       String        @unique
-  timeAdded DateTime      @default(now())
+  createdAt DateTime      @default(now())
   ticks     WebsiteTick[]
-  userId    String
-  user      User          @relation(fields: [userId], references: [id])
+  users     User[]        @relation("UserWebsites")
 }
 
 model Region {
