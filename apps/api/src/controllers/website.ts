@@ -144,3 +144,43 @@ export const getWebsiteStatus = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" })
   }
 }
+
+export const getAllWebsites = async (req: Request, res: Response) => {
+  try {
+    const websites = await prisma.website.findMany({
+      where: {
+        users: {
+          some: {
+            id: req.userId as string,
+          },
+        },
+      },
+      include: {
+        ticks: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+          include: {
+            region: true,
+          },
+        },
+      },
+    })
+
+    const formattedWebsites = websites.map(website => ({
+      id: website.id,
+      url: website.url,
+      status: website?.ticks[0]?.status,
+      responseTime: website?.ticks[0]?.responseTimeMs,
+      lastCheck: website?.ticks[0]?.createdAt,
+      region: website?.ticks[0]?.region?.name,
+    }))
+
+    res.status(200).json({
+      websites: formattedWebsites,
+    })
+  } catch (_e) {
+    res.status(500).json({ message: "Internal server error" })
+  }
+}

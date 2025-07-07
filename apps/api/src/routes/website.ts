@@ -1,6 +1,6 @@
 import { createWebsiteSchema, getWebsiteStatusSchema } from "@repo/shared"
 import { Router } from "express"
-import { createWebsite, getWebsiteStatus } from "../controllers/website"
+import { createWebsite, getAllWebsites, getWebsiteStatus } from "../controllers/website"
 import { verifyToken } from "../middlewares/authenticate"
 import { validateBody, validateParams } from "../middlewares/validate"
 
@@ -14,5 +14,7 @@ websiteRouter.get(
   validateParams(getWebsiteStatusSchema),
   getWebsiteStatus,
 )
+
+websiteRouter.get("/all", verifyToken, getAllWebsites)
 
 export default websiteRouter
