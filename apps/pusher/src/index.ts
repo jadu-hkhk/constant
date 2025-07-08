@@ -9,10 +9,12 @@ async function main() {
     },
   })
 
-  console.log(websites)
   await xAddBulk(websites)
 }
 
-setInterval(() => {
-  main()
-}, 3 * 1000)
+setInterval(
+  () => {
+    main()
+  },
+  3 * 60 * 1000,
+)

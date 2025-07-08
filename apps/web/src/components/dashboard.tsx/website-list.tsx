@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
-import { AlertCircle, CheckCircle, Globe, Settings } from "lucide-react"
+import { AlertCircle, CheckCircle, ExternalLink, Globe, Loader2 } from "lucide-react"
+import Link from "next/link"
 import type { WebsiteData } from "@/lib/types"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
@@ -30,8 +31,10 @@ export function WebsiteList({ websites }: WebsiteListProps) {
                 <div className="flex items-center space-x-2">
                   {website.status === "UP" ? (
                     <CheckCircle className="w-5 h-5 text-status-success" />
-                  ) : (
+                  ) : website.status === "DOWN" ? (
                     <AlertCircle className="w-5 h-5 text-status-error" />
+                  ) : (
+                    <Loader2 className="w-5 h-5 text-status-warning animate-spin" />
                   )}
                   <span className="font-medium text-white">{website.url}</span>
                 </div>
@@ -40,10 +43,16 @@ export function WebsiteList({ websites }: WebsiteListProps) {
                   className={
                     website.status === "UP"
                       ? "bg-status-success/20 text-status-success border-status-success/30"
-                      : "bg-status-error/20 text-status-error border-status-error/30"
+                      : website.status === "DOWN"
+                        ? "bg-status-error/20 text-status-error border-status-error/30"
+                        : "bg-status-warning/20 text-status-warning border-status-warning/30"
                   }
                 >
-                  {website.status === "UP" ? "Online" : "Offline"}
+                  {website.status === "UP"
+                    ? "Online"
+                    : website.status === "DOWN"
+                      ? "Offline"
+                      : "Pending"}
                 </Badge>
               </div>
 
@@ -55,15 +64,48 @@ export function WebsiteList({ websites }: WebsiteListProps) {
                   <p>Response Time</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-white font-medium">{website.region}</p>
+                  {website.region ? (
+                    <p className="text-white font-medium">{website.region}</p>
+                  ) : (
+                    <span className="text-sm text-gray-400">N/A</span>
+                  )}
                   <p>Region</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-white font-medium">{website.lastCheck}</p>
+                  <p className="text-white font-medium">
+                    {website.lastCheck ? (
+                      <span className="flex flex-col">
+                        <span className="text-sm text-white">
+                          {new Date(website.lastCheck).toLocaleString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}
+                        </span>
+                        <span className="text-sm text-white/80">
+                          {new Date(website.lastCheck).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-sm text-gray-400">N/A</span>
+                    )}
+                  </p>
                   <p>Last Check</p>
                 </div>
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                  <Settings className="w-4 h-4" />
+                <Button asChild variant="ghost" size="sm" className="text-gray-400 group">
+                  <Link
+                    href={`/app/website/${website.id}`}
+                    className="flex flex-col items-center gap-2"
+                  >
+                    <ExternalLink className="w-4 h-4 group-hover:text-white transition-all duration-300" />
+                    <span className="text-sm text-gray-400 group-hover:text-white transition-all duration-300">
+                      More Info
+                    </span>
+                  </Link>
                 </Button>
               </div>
             </div>

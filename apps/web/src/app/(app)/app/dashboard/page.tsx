@@ -1,7 +1,7 @@
 "use client"
 
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 import { AddWebsiteForm } from "@/components/dashboard.tsx/add-website-form"
 import { DashboardHeader } from "@/components/dashboard.tsx/dashboard-header"
@@ -12,28 +12,43 @@ import type { WebsiteData } from "@/lib/types"
 import { BACKEND_URL } from "@/lib/utils"
 
 export default function DashboardPage() {
+  const [isLoading, setIsLoading] = useState(false)
   const [websites, setWebsites] = useState<WebsiteData[]>([])
 
-  useEffect(() => {
-    const fetchWebsites = async () => {
-      try {
-        const { data } = await axios.get(`${BACKEND_URL}/website/all`, { withCredentials: true })
-        setWebsites(data.websites as WebsiteData[])
-      } catch (e) {
-        if (axios.isAxiosError(e)) {
-          toast.error(e.response?.data.message)
-        } else {
-          toast.error("Internal server error")
-        }
+  const fetchWebsites = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const { data } = await axios.get(`${BACKEND_URL}/website/all`, { withCredentials: true })
+      setWebsites(data.websites as WebsiteData[])
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        toast.error(e.response?.data.message)
+      } else {
+        toast.error("Internal server error")
       }
+    } finally {
+      setIsLoading(false)
     }
-
-    fetchWebsites()
   }, [])
+
+  // fetch websites on mount
+  useEffect(() => {
+    fetchWebsites()
+  }, [fetchWebsites])
+
+  useEffect(() => {
+    const interval = setInterval(
+      () => {
+        fetchWebsites()
+      },
+      3 * 60 * 1000,
+    )
+    return () => clearInterval(interval)
+  }, [fetchWebsites])
 
   return (
     <div className="min-h-screen bg-background pt-16">
-      <DashboardHeader />
+      <DashboardHeader refreshWebsites={fetchWebsites} isLoading={isLoading} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Stats websites={websites} />
