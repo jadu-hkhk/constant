@@ -1,6 +1,11 @@
-import { createWebsiteSchema, getWebsiteStatusSchema } from "@repo/shared"
+import { createWebsiteSchema, getWebsiteDetailsSchema, getWebsiteTicksSchema } from "@repo/shared"
 import { Router } from "express"
-import { createWebsite, getAllWebsites, getWebsiteStatus } from "../controllers/website"
+import {
+  createWebsite,
+  getAllWebsites,
+  getWebsiteDetails,
+  getWebsiteTicks,
+} from "../controllers/website"
 import { verifyToken } from "../middlewares/authenticate"
 import { validateBody, validateParams } from "../middlewares/validate"
 
@@ -9,10 +14,17 @@ const websiteRouter: Router = Router()
 websiteRouter.post("/", verifyToken, validateBody(createWebsiteSchema), createWebsite)
 
 websiteRouter.get(
-  "/status/:websiteId",
+  "/details/:websiteId",
   verifyToken,
-  validateParams(getWebsiteStatusSchema),
-  getWebsiteStatus,
+  validateParams(getWebsiteDetailsSchema),
+  getWebsiteDetails,
+)
+
+websiteRouter.get(
+  "/ticks/:websiteId",
+  verifyToken,
+  validateParams(getWebsiteTicksSchema),
+  getWebsiteTicks,
 )
 
 websiteRouter.get("/all", verifyToken, getAllWebsites)

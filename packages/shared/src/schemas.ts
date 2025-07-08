@@ -14,6 +14,10 @@ export const createWebsiteSchema = z.object({
   url: z.string().url("Invalid URL"),
 })
 
-export const getWebsiteStatusSchema = z.object({
+export const getWebsiteDetailsSchema = z.object({
+  websiteId: z.string().cuid("Invalid website ID"),
+})
+
+export const getWebsiteTicksSchema = z.object({
   websiteId: z.string().cuid("Invalid website ID"),
 })
