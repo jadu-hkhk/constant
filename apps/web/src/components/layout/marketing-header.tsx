@@ -1,11 +1,15 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { Suspense, useEffect, useState } from "react"
 import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useAuthStore } from "@/store/authStore"
+import { cn } from "@/lib/utils"
 
 interface MobileMenuButtonProps {
   isMenuOpen: boolean
@@ -46,20 +50,77 @@ export function MarketingHeader() {
 }
 
 function DesktopAuthButtons() {
+  const { isAuthenticated, signOut, checkAuth } = useAuthStore()
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push("/")
+  }
+
   return (
     <div className="hidden md:flex items-center space-x-4">
-      <Button
-        asChild
-        className="text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-200"
-      >
-        <Link href="/signin">Sign In</Link>
-      </Button>
-      <Button
-        asChild
-        className="bg-brand-primary hover:bg-brand-primary/90 text-white transition-colors duration-200"
-      >
-        <Link href="/signup">Sign Up</Link>
-      </Button>
+      {isAuthenticated === null ? (
+        <>
+          <Skeleton className="w-[5.5rem] h-9 mr-6 border-1 border-white/20 rounded-md animate-pulse" />
+          <Skeleton className="w-[5.5rem] h-9 border-1 border-white/40 rounded-md animate-pulse" />
+        </>
+      ) : isAuthenticated ? (
+        <>
+        <div className="relative">
+          <Button
+            asChild
+            className={cn(
+              "hover:text-white text-white/80",
+              {
+                "text-white": pathname.includes("/app/dashboard"),
+              }
+            )}
+          >
+            <Link href="/app/dashboard">Dashboard</Link>
+          </Button>
+          {pathname === "/app/dashboard" && (
+                <motion.div
+                  layoutId="header-active-link"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className={cn(
+                    "bg-white/20 h-1 w-full absolute bottom-0 transition-all duration-200 rounded-full",
+                    pathname.includes("/app/dashboard") &&
+                      "bg-gradient-to-b from-brand-primary/5 to-pink-300/30"
+                  )}
+              ></motion.div>
+            )}
+          </div>
+          <Button
+            onClick={handleSignOut}
+            variant="outline"
+            className="cursor-pointer hover:text-white text-white/80"
+          >
+            Sign Out
+          </Button>
+        </>
+      ) : (
+        <>
+          <Button
+            asChild
+            className="text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-200"
+          >
+            <Link href="/signin">Sign In</Link>
+          </Button>
+          <Button
+            asChild
+            className="bg-brand-primary hover:bg-brand-primary/90 text-white transition-colors duration-200"
+          >
+            <Link href="/signup">Sign Up</Link>
+          </Button>
+        </>
+      )}
     </div>
   )
 }
@@ -96,6 +157,17 @@ function MobileMenuButton({ isMenuOpen, setIsMenuOpen }: MobileMenuButtonProps) 
 }
 
 function MobileMenu({ navItems, setIsMenuOpen }: MobileMenuProps) {
+  const { isAuthenticated, checkAuth, signOut } = useAuthStore()
+  const router = useRouter()
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push("/")
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -114,21 +186,33 @@ function MobileMenu({ navItems, setIsMenuOpen }: MobileMenuProps) {
             {item.label}
           </Link>
         ))}
-        <div className="flex flex-col space-y-2 pt-4 border-t border-brand-primary/20">
-          <Link href="/signin" onClick={() => setIsMenuOpen(false)}>
-            <Button
-              variant="ghost"
-              className="w-full text-gray-300 hover:text-white hover:bg-white/10"
-            >
-              Sign In
+        {isAuthenticated === null ? (
+          <Skeleton className="w-full h-10" />
+        ) : isAuthenticated ? (
+          <div className="flex flex-col space-y-2 pt-4 border-t border-brand-primary/20">
+            <Link href="/app/dashboard" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+                Dashboard
+              </Button>
+            </Link>
+            <Button onClick={handleSignOut} variant="outline" className="cursor-pointer hover:text-white text-white/80">
+              Sign Out
             </Button>
-          </Link>
-          <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
-            <Button className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white transition-colors duration-200">
-              Sign Up
-            </Button>
-          </Link>
-        </div>
+          </div>
+        ) : (
+          <div className="flex flex-col space-y-2 pt-4 border-t border-brand-primary/20">
+            <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white transition-colors duration-200">
+                Sign Up
+              </Button>
+            </Link>
+            <Link href="/signin" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        )}
       </nav>
     </motion.div>
   )

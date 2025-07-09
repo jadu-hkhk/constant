@@ -16,7 +16,7 @@ export function Hero() {
         <HeroHeadline />
         <HeroSubheading />
         <CTAButtons />
-        <Stats />
+        {/* <Stats /> */}
       </div>
     </section>
   )
