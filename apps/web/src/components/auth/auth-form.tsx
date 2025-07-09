@@ -26,7 +26,8 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
       )
 
       toast.success(response.data.message)
-      type === "signin" ? router.push("/app/dashboard") : router.push("/signin")
+      if (type === "signin") router.push("/app/dashboard")
+      else router.push("/signin")
     } catch (e) {
       if (axios.isAxiosError(e)) {
         toast.error(e.response?.data.message)

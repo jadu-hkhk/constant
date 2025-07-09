@@ -4,7 +4,6 @@ import { AnimatedBackground } from "./animated-background"
 import { CTAButtons } from "./cta-buttons"
 import { HeroHeadline } from "./hero-headline"
 import { HeroSubheading } from "./hero-subheading"
-import { Stats } from "./stats"
 import { StatusBadge } from "./status-badge"
 
 export function Hero() {
@@ -16,7 +15,6 @@ export function Hero() {
         <HeroHeadline />
         <HeroSubheading />
         <CTAButtons />
-        {/* <Stats /> */}
       </div>
     </section>
   )

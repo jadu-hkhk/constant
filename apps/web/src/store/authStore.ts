@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthStore>(set => ({
         withCredentials: true,
       })
       set({ user: data.user, isAuthenticated: !!data.user })
-    } catch (_e) {
+    } catch {
       set({ user: null, isAuthenticated: false })
     }
   },

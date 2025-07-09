@@ -1,15 +1,15 @@
 "use client"
 
-import { AnimatePresence, motion } from "framer-motion"
+import { motion } from "framer-motion"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Suspense, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useAuthStore } from "@/store/authStore"
 import { cn } from "@/lib/utils"
+import { useAuthStore } from "@/store/authStore"
 
 interface MobileMenuButtonProps {
   isMenuOpen: boolean
@@ -71,29 +71,26 @@ function DesktopAuthButtons() {
         </>
       ) : isAuthenticated ? (
         <>
-        <div className="relative">
-          <Button
-            asChild
-            className={cn(
-              "hover:text-white text-white/80",
-              {
+          <div className="relative">
+            <Button
+              asChild
+              className={cn("hover:text-white text-white/80", {
                 "text-white": pathname.includes("/app/dashboard"),
-              }
-            )}
-          >
-            <Link href="/app/dashboard">Dashboard</Link>
-          </Button>
-          {pathname === "/app/dashboard" && (
-                <motion.div
-                  layoutId="header-active-link"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className={cn(
-                    "bg-white/20 h-1 w-full absolute bottom-0 transition-all duration-200 rounded-full",
-                    pathname.includes("/app/dashboard") &&
-                      "bg-gradient-to-b from-brand-primary/5 to-pink-300/30"
-                  )}
+              })}
+            >
+              <Link href="/app/dashboard">Dashboard</Link>
+            </Button>
+            {pathname === "/app/dashboard" && (
+              <motion.div
+                layoutId="header-active-link"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className={cn(
+                  "bg-white/20 h-1 w-full absolute bottom-0 transition-all duration-200 rounded-full",
+                  pathname.includes("/app/dashboard") &&
+                    "bg-gradient-to-b from-brand-primary/5 to-pink-300/30",
+                )}
               ></motion.div>
             )}
           </div>
@@ -191,23 +188,36 @@ function MobileMenu({ navItems, setIsMenuOpen }: MobileMenuProps) {
         ) : isAuthenticated ? (
           <div className="flex flex-col space-y-2 pt-4 border-t border-brand-primary/20">
             <Link href="/app/dashboard" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+              <Button
+                variant="ghost"
+                className="w-full text-gray-300 hover:text-white hover:bg-white/10"
+              >
                 Dashboard
               </Button>
             </Link>
-            <Button onClick={handleSignOut} variant="outline" className="cursor-pointer hover:text-white text-white/80">
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              className="cursor-pointer hover:text-white text-white/80"
+            >
               Sign Out
             </Button>
           </div>
         ) : (
           <div className="flex flex-col space-y-2 pt-4 border-t border-brand-primary/20">
             <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white transition-colors duration-200">
+              <Button
+                variant="ghost"
+                className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white transition-colors duration-200"
+              >
                 Sign Up
               </Button>
             </Link>
             <Link href="/signin" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+              <Button
+                variant="ghost"
+                className="w-full text-gray-300 hover:text-white hover:bg-white/10"
+              >
                 Sign In
               </Button>
             </Link>

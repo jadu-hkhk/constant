@@ -59,17 +59,14 @@ export function ResponseTimeChart({ ticks }: ResponseTimeChartProps) {
                 borderRadius: "8px",
                 color: "#fff",
               }}
-              formatter={(value: any, name: string) => [
-                value ? `${value}ms` : "Down",
-                "Response Time",
-              ]}
+              formatter={(value: number) => [value ? `${value}ms` : "Down", "Response Time"]}
             />
             <Line
               type="monotone"
               dataKey="responseTime"
               stroke="hsl(var(--brand-primary))"
               strokeWidth={3}
-              dot={(props: any) => {
+              dot={(props: { cx: number; cy: number; payload: { status: string } }) => {
                 const { cx, cy, payload } = props
                 return (
                   <circle

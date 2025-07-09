@@ -38,7 +38,7 @@ async function processWebsite(website: WebsiteEvent) {
 
   try {
     const startTime = Date.now()
-    await axios.get(url)
+    await axios.get(url, { timeout: 15 * 1000 })
     const endTime = Date.now()
     const duration = endTime - startTime
 

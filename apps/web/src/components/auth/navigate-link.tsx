@@ -30,7 +30,7 @@ export function BackToHomeLink() {
 export function SignUpLink() {
   return (
     <p className="text-center text-gray-400 mt-6">
-      Don't have an account?{" "}
+      Don&apos;t have an account?{" "}
       <Link
         href="/signup"
         className="text-brand-primary hover:text-brand-secondary transition-colors"
