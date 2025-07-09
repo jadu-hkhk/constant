@@ -69,3 +69,34 @@ export const signOut = async (_req: Request, res: Response) => {
     message: "Sign out successful",
   })
 }
+
+export const checkAuth = async (req: Request, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.userId,
+      },
+      select: {
+        id: true,
+        email: true,
+      },
+    })
+
+    if (!user) {
+      res.status(401).json({
+        message: "User not found",
+      })
+      return
+    }
+
+    res.status(200).json({
+      message: "User is authenticated",
+      user,
+    })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({
+      message: "Internal server error",
+    })
+  }
+}
