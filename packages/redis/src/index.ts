@@ -1,7 +1,9 @@
 import type { WebsiteEvent, XReadGroupResponse } from "@repo/shared"
 import { createClient } from "redis"
 
-const redisClient = createClient()
+const redisClient = createClient({
+  url: process.env.REDIS_URL ?? "redis://default:default@localhost:6379",
+})
 
 redisClient
   .connect()
