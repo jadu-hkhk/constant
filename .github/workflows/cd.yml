@@ -1,0 +1,161 @@
+name: BUILD AND DEPLOY
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - '!apps/web/**'
+
+jobs: 
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs: 
+      api_changed: ${{ steps.changes.outputs.api }}
+      pusher_changed: ${{ steps.changes.outputs.pusher }}
+      worker_changed: ${{ steps.changes.outputs.worker }}
+    steps: 
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'packages/shared/**'
+              - 'packages/database/**'
+            pusher:
+              - 'apps/pusher/**'
+              - 'packages/shared/**'
+              - 'packages/database/**'
+              - 'packages/redis/**'
+            worker: 
+              - 'apps/worker/**'
+              - 'packages/shared/**'
+              - 'packages/database/**'
+              - 'packages/redis/**'
+
+
+  build-and-push:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and push API
+        if: needs.detect-changes.outputs.api_changed == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          file: ./apps/api/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/api-constant:${{ github.sha }}
+          cache-from: type=gha,scope=api-cache
+          cache-to: type=gha,scope=api-cache,mode=max
+
+      - name: Build and push Pusher
+        if: needs.detect-changes.outputs.pusher_changed == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          file: ./apps/pusher/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/pusher-constant:${{ github.sha }}
+          cache-from: type=gha,scope=pusher-cache
+          cache-to: type=gha,scope=pusher-cache,mode=max
+
+      - name: Build and push Worker
+        if: needs.detect-changes.outputs.worker_changed == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          file: ./apps/worker/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/worker-constant:${{ github.sha }}
+          cache-from: type=gha,scope=worker-cache
+          cache-to: type=gha,scope=worker-cache,mode=max
+
+  deploy:
+    needs: [build-and-push, detect-changes]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy API 
+        if: needs.detect-changes.outputs.api_changed == 'true'
+        uses: appleboy/ssh-action@v1
+        with: 
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USERNAME }}
+          key: ${{ secrets.REMOTE_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/api-constant:${{ github.sha }}
+            docker stop api-constant || true
+            docker rm api-constant || true
+            docker run -d --restart unless-stopped \
+              --name api-constant \
+              -p 5000:5000 \
+              -e "PORT=5000" \
+              -e "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
+              -e "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+              -e "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" \
+              -e "NODE_ENV=production" \
+              -e "COOKIE_DOMAIN=${{ secrets.COOKIE_DOMAIN }}" \
+              ${{ secrets.DOCKERHUB_USERNAME }}/api-constant:${{ github.sha }}
+            docker images | grep "${{ secrets.DOCKERHUB_USERNAME }}/api-constant" | grep -v "${{ github.sha }}" | awk '{print $3}' | xargs -r docker rmi || true
+
+      - name: Deploy Pusher
+        if: needs.detect-changes.outputs.pusher_changed == 'true'
+        uses: appleboy/ssh-action@v1
+        with: 
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USERNAME }}
+          key: ${{ secrets.REMOTE_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pusher-constant:${{ github.sha }}
+            docker stop pusher-constant || true
+            docker rm pusher-constant || true
+            docker run -d --restart unless-stopped \
+              --name pusher-constant \
+              --network constant \
+              -e "REDIS_URL=${{ secrets.REDIS_URL }}" \
+              -e "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
+              ${{ secrets.DOCKERHUB_USERNAME }}/pusher-constant:${{ github.sha }}
+            docker images | grep "${{ secrets.DOCKERHUB_USERNAME }}/pusher-constant" | grep -v "${{ github.sha }}" | awk '{print $3}' | xargs -r docker rmi || true
+
+      - name: Deploy Worker
+        if: needs.detect-changes.outputs.worker_changed == 'true'
+        uses: appleboy/ssh-action@v1
+        with: 
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USERNAME }}
+          key: ${{ secrets.REMOTE_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/worker-constant:${{ github.sha }}
+            docker stop worker-constant || true
+            docker rm worker-constant || true
+            docker run -d --restart unless-stopped \
+              --name worker-constant \
+              --network constant \
+              -e "REDIS_URL=${{ secrets.REDIS_URL }}" \
+              -e "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
+              -e "REGION_ID=${{ secrets.REGION_ID }}" \
+              -e "WORKER_ID=${{ secrets.WORKER_ID }}" \
+              ${{ secrets.DOCKERHUB_USERNAME }}/worker-constant:${{ github.sha }}
+            docker images | grep "${{ secrets.DOCKERHUB_USERNAME }}/worker-constant" | grep -v "${{ github.sha }}" | awk '{print $3}' | xargs -r docker rmi || true
