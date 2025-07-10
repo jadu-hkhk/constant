@@ -64,7 +64,12 @@ export const signIn = async (req: Request, res: Response) => {
 }
 
 export const signOut = async (_req: Request, res: Response) => {
-  res.clearCookie("token")
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    domain: process.env.NODE_ENV === "production" ? process.env.COOKIE_DOMAIN : undefined,
+  })
   res.status(200).json({
     message: "Sign out successful",
   })
