@@ -1,6 +1,7 @@
 {
   "name": "@repo/db",
   "version": "0.0.0",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
     "./__mocks__": "./dist/__mocks__/index.js"
@@ -9,13 +10,19 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",
     "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
     "build": "tsc -b",
-    "dev": "tsc -b --watch"
+    "dev": "tsc --watch"
+  },
+  "prisma": {
+    "seed": "ts-node src/seed.ts"
   },
   "devDependencies": {
     "prisma": "^6.10.1",
-    "vitest-mock-extended": "^3.1.0",
-    "@repo/typescript-config": "workspace:*"
+    "ts-node": "^10.9.2",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^24.0.13",
+    "vitest-mock-extended": "^3.1.0"
   },
   "dependencies": {
     "@prisma/client": "^6.10.1"

@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -b",
-    "dev": "tsc -b --watch"
+    "dev": "tsc --watch"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*"
