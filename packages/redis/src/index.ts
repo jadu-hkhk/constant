@@ -2,7 +2,7 @@ import type { WebsiteEvent, XReadGroupResponse } from "@repo/shared"
 import { createClient } from "redis"
 
 const redisClient = createClient({
-  url: process.env.REDIS_URL ?? "redis://redis:6379",
+  url: process.env.REDIS_URL,
 })
 
 redisClient

@@ -15,18 +15,35 @@
       "dependsOn": ["^check-types"]
     },
     "dev": {
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["^build", "db:generate"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "API_PORT",
+        "DATABASE_URL",
+        "NEXT_PUBLIC_API_BACKEND_URL",
+        "FRONTEND_URL",
+        "JWT_SECRET",
+        "COOKIE_DOMAIN",
+        "REDIS_URL",
+        "WORKER_ID",
+        "REGION_ID",
+        "REGION_NAME"
+      ]
     },
     "db:generate": {
       "cache": false
     },
     "db:migrate": {
+      "env": ["DATABASE_URL"],
       "cache": false,
       "persistent": true
     },
     "db:deploy": {
+      "cache": false
+    },
+    "db:seed": {
+      "env": ["DATABASE_URL", "REGION_ID", "REGION_NAME"],
       "cache": false
     },
     "test": {
