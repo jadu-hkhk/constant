@@ -34,6 +34,7 @@ export default function WebsitePage() {
 
   const [website, setWebsite] = useState<WebsiteDetails | null>(null)
   const [ticks, setTicks] = useState<Tick[] | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const fetchWebsiteData = useCallback(async () => {
     try {
@@ -48,12 +49,15 @@ export default function WebsitePage() {
 
   const fetchTicksData = useCallback(async () => {
     try {
+      setIsLoading(true)
       const { data } = await axios.get(`${BACKEND_URL}/website/ticks/${websiteId}`, {
         withCredentials: true,
       })
       setTicks(data.ticks)
     } catch (error) {
       console.error("Error fetching ticks data:", error)
+    } finally {
+      setIsLoading(false)
     }
   }, [websiteId])
 
@@ -70,7 +74,11 @@ export default function WebsitePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <WebsiteHeader website={website ?? undefined} />
+          <WebsiteHeader
+            website={website ?? undefined}
+            isLoading={isLoading}
+            handleRefreshWebsiteTicks={fetchTicksData}
+          />
         </motion.div>
 
         <motion.div

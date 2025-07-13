@@ -1,5 +1,6 @@
 "use client"
 
+import axios from "axios"
 import { motion } from "framer-motion"
 import {
   AlertCircle,
@@ -8,12 +9,16 @@ import {
   CheckCircle,
   ExternalLink,
   Globe,
-  Settings,
+  RefreshCcw,
+  RefreshCw,
+  Trash,
 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { BACKEND_URL, cn } from "@/lib/utils"
 
 interface WebsiteHeaderProps {
   website?: {
@@ -23,15 +28,32 @@ interface WebsiteHeaderProps {
     region: string
     createdAt: string
   }
+  isLoading: boolean
+  handleRefreshWebsiteTicks: () => void
 }
 
-export function WebsiteHeader({ website }: WebsiteHeaderProps) {
+export function WebsiteHeader({
+  website,
+  isLoading,
+  handleRefreshWebsiteTicks,
+}: WebsiteHeaderProps) {
+  const router = useRouter()
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     })
+  }
+
+  const handleDeleteWebsite = async () => {
+    try {
+      await axios.delete(`${BACKEND_URL}/website/${website?.id}`, { withCredentials: true })
+      router.push("/app/dashboard")
+      toast.success("Website deleted successfully")
+    } catch (_e) {
+      toast.error("Error deleting website")
+    }
   }
 
   return (
@@ -66,9 +88,26 @@ export function WebsiteHeader({ website }: WebsiteHeaderProps) {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-white/5">
-            <Settings className="w-4 h-4 mr-2" />
-            Edit
+          <Button
+            variant="outline"
+            className="border-gray-600 text-gray-300 hover:bg-white/5 cursor-pointer"
+            onClick={handleRefreshWebsiteTicks}
+          >
+            <RefreshCw
+              className={cn("w-4 h-4 mr-2", {
+                "animate-spin": isLoading,
+              })}
+            />
+            Refresh
+          </Button>
+
+          <Button
+            variant="outline"
+            className="border-gray-600 text-gray-300 hover:bg-white/5 cursor-pointer text-red-400 hover:text-red-500"
+            onClick={handleDeleteWebsite}
+          >
+            <Trash className="w-4 h-4 mr-2" />
+            Delete
           </Button>
         </div>
       </div>
