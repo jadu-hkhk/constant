@@ -21,3 +21,7 @@ export const getWebsiteDetailsSchema = z.object({
 export const getWebsiteTicksSchema = z.object({
   websiteId: z.string().cuid("Invalid website ID"),
 })
+
+export const deleteWebsiteSchema = z.object({
+  websiteId: z.string().cuid("Invalid website ID"),
+})

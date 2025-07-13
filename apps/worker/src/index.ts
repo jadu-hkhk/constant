@@ -54,14 +54,18 @@ async function processWebsite(website: WebsiteEvent) {
       },
     })
   } catch (_e) {
-    await prisma.websiteTick.create({
-      data: {
-        responseTimeMs: 0,
-        websiteId: id,
-        regionId: regionId as string,
-        status: "DOWN",
-      },
-    })
+    try {
+      await prisma.websiteTick.create({
+        data: {
+          responseTimeMs: 0,
+          websiteId: id,
+          regionId: regionId as string,
+          status: "DOWN",
+        },
+      })
+    } catch (e) {
+      console.error("Error creating website tick for website: ", url, e)
+    }
   }
 }
 

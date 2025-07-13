@@ -1,7 +1,13 @@
-import { createWebsiteSchema, getWebsiteDetailsSchema, getWebsiteTicksSchema } from "@repo/shared"
+import {
+  createWebsiteSchema,
+  deleteWebsiteSchema,
+  getWebsiteDetailsSchema,
+  getWebsiteTicksSchema,
+} from "@repo/shared"
 import { Router } from "express"
 import {
   createWebsite,
+  deleteWebsite,
   getAllWebsites,
   getWebsiteDetails,
   getWebsiteTicks,
@@ -28,5 +34,7 @@ websiteRouter.get(
 )
 
 websiteRouter.get("/all", verifyToken, getAllWebsites)
+
+websiteRouter.delete("/:websiteId", verifyToken, validateParams(deleteWebsiteSchema), deleteWebsite)
 
 export default websiteRouter
