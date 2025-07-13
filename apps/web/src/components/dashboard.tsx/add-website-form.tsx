@@ -46,7 +46,7 @@ export function AddWebsiteForm({ setWebsites }: AddWebsiteFormProps) {
     }
   }
   return (
-    <form onSubmit={handleAddWebsite} className="flex gap-4">
+    <form onSubmit={handleAddWebsite} className="flex flex-col sm:flex-row gap-4">
       <Input
         type="url"
         placeholder="https://example.com"
@@ -58,14 +58,15 @@ export function AddWebsiteForm({ setWebsites }: AddWebsiteFormProps) {
       <Button
         type="submit"
         disabled={isAddingWebsite}
-        className="bg-brand-primary hover:bg-brand-primary/90 text-white"
+        className="bg-brand-primary hover:bg-brand-primary/90 text-white w-full sm:w-auto"
       >
         {isAddingWebsite ? (
           <Activity className="w-4 h-4 mr-2 animate-spin" />
         ) : (
           <Plus className="w-4 h-4 mr-2" />
         )}
-        {isAddingWebsite ? "Adding..." : "Add Website"}
+        <span className="hidden sm:inline">{isAddingWebsite ? "Adding..." : "Add Website"}</span>
+        <span className="sm:hidden">{isAddingWebsite ? "Adding..." : "Add"}</span>
       </Button>
     </form>
   )

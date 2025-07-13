@@ -16,7 +16,11 @@ export function DashboardHeader({ refreshWebsites, isLoading }: DashboardHeaderP
             <h1 className="text-3xl font-bold text-white">Dashboard</h1>
             <p className="text-gray-400 mt-1">Monitor your websites and get instant alerts</p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex justify-center md:items-center space-y-2 md:space-x-4 flex-col md:flex-row gap-2 md:gap-0">
+            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-white/5">
+              <BellDot className="w-4 h-4 mr-2" />
+              Alerts
+            </Button>
             <Button
               variant="outline"
               className="border-gray-600 text-gray-300 hover:bg-white/5"
@@ -28,10 +32,6 @@ export function DashboardHeader({ refreshWebsites, isLoading }: DashboardHeaderP
                 })}
               />
               Refresh
-            </Button>
-            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-white/5">
-              <BellDot className="w-4 h-4 mr-2" />
-              Alerts
             </Button>
           </div>
         </div>

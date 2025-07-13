@@ -29,28 +29,32 @@ export function ResponseTimeChart({ ticks }: ResponseTimeChartProps) {
     }))
 
   return (
-    <Card className="p-6 glass border-brand-primary/20">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-semibold text-white">Response Time</h3>
-        <div className="flex items-center space-x-2 text-sm text-gray-400">
-          <Clock className="w-4 h-4" />
+    <Card className="p-4 sm:p-6 glass border-brand-primary/20">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <h3 className="text-xl sm:text-2xl font-semibold text-white">Response Time</h3>
+        <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-400">
+          <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
           <span>Last 10 checks</span>
         </div>
       </div>
-      <div className="h-64">
+      <div className="h-48 sm:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <XAxis
               dataKey="time"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#9ca3af", fontSize: 12 }}
+              tick={{ fill: "#9ca3af", fontSize: 10 }}
+              interval="preserveStartEnd"
+              minTickGap={20}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#9ca3af", fontSize: 12 }}
+              tick={{ fill: "#9ca3af", fontSize: 10 }}
               domain={["dataMin - 10", "dataMax + 10"]}
+              width={40}
+              tickFormatter={(value: number) => `${value}ms`}
             />
             <Tooltip
               contentStyle={{
@@ -58,6 +62,7 @@ export function ResponseTimeChart({ ticks }: ResponseTimeChartProps) {
                 border: "1px solid rgba(226, 115, 150, 0.2)",
                 borderRadius: "8px",
                 color: "#fff",
+                fontSize: "12px",
               }}
               formatter={(value: number) => [value ? `${value}ms` : "Down", "Response Time"]}
             />
@@ -65,20 +70,21 @@ export function ResponseTimeChart({ ticks }: ResponseTimeChartProps) {
               type="monotone"
               dataKey="responseTime"
               stroke="hsl(var(--brand-primary))"
-              strokeWidth={3}
+              strokeWidth={2}
               dot={(props: { cx: number; cy: number; payload: { status: string } }) => {
                 const { cx, cy, payload } = props
                 return (
                   <circle
+                    key={cx}
                     cx={cx}
                     cy={cy}
-                    r={4}
+                    r={3}
                     fill={
                       payload.status === "UP"
                         ? "hsl(var(--brand-primary))"
                         : "hsl(var(--status-error))"
                     }
-                    strokeWidth={2}
+                    strokeWidth={1}
                     stroke={
                       payload.status === "UP"
                         ? "hsl(var(--brand-primary))"
@@ -87,7 +93,7 @@ export function ResponseTimeChart({ ticks }: ResponseTimeChartProps) {
                   />
                 )
               }}
-              activeDot={{ r: 6, fill: "hsl(var(--brand-primary))" }}
+              activeDot={{ r: 4, fill: "hsl(var(--brand-primary))" }}
               connectNulls={false}
             />
           </LineChart>

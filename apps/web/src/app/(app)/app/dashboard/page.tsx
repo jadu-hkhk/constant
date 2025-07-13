@@ -53,7 +53,7 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Stats websites={websites} />
         <Card className="p-6 glass border-brand-primary/20 mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Add New Website</h2>
+          <h2 className="text-xl font-semibold text-white md:mb-4">Add New Website</h2>
           <AddWebsiteForm setWebsites={setWebsites} />
         </Card>
         <WebsiteList websites={websites} />

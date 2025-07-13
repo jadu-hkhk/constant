@@ -59,7 +59,7 @@ export function WebsiteStats({ ticks }: WebsiteStatsProps) {
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
       {stats.map((stat, index) => (
         <motion.div
           key={stat.title}
@@ -69,18 +69,22 @@ export function WebsiteStats({ ticks }: WebsiteStatsProps) {
           whileHover={{ y: -4 }}
         >
           <Card
-            className={`p-6 glass border-brand-primary/20 hover:border-brand-primary/40 transition-all duration-300 bg-gradient-to-br ${stat.bgColor}`}
+            className={`p-4 sm:p-6 glass border-brand-primary/20 hover:border-brand-primary/40 transition-all duration-300 bg-gradient-to-br ${stat.bgColor}`}
           >
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-gray-400 text-sm font-medium">{stat.title}</p>
-                <p className="text-3xl font-bold text-white">{stat.value}</p>
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-gray-400 text-xs sm:text-sm font-medium truncate">
+                  {stat.title}
+                </p>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">
+                  {stat.value}
+                </p>
               </div>
-              <div className={`p-3 rounded-xl bg-white/5 ${stat.color}`}>
-                <stat.icon className="w-6 h-6" />
+              <div className={`p-2 sm:p-3 rounded-xl bg-white/5 ${stat.color} flex-shrink-0 ml-2`}>
+                <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
               </div>
             </div>
-            <p className="text-xs text-gray-500">{stat.change}</p>
+            <p className="text-xs text-gray-500 truncate">{stat.change}</p>
           </Card>
         </motion.div>
       ))}
